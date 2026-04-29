@@ -1,0 +1,26 @@
+2026/04/29 01:51:40 Connected to MongoDB
+2026/04/29 01:51:40 Indexes created successfully
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (4 handlers)
+[GIN-debug] HEAD   /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (4 handlers)
+[GIN-debug] GET    /assets/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (4 handlers)
+[GIN-debug] HEAD   /assets/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (4 handlers)
+[GIN-debug] GET    /favicon.ico              --> main.main.(*RouterGroup).StaticFile.func6 (4 handlers)
+[GIN-debug] HEAD   /favicon.ico              --> main.main.(*RouterGroup).StaticFile.func6 (4 handlers)
+[GIN-debug] GET    /health                   --> main.main.func3 (4 handlers)
+[GIN-debug] POST   /api/v1/auth/google       --> huasteca-backend/internal/controllers.(*AuthController).GoogleAuth-fm (4 handlers)
+[GIN-debug] GET    /api/v1/products          --> huasteca-backend/internal/controllers.(*ProductController).GetProducts-fm (4 handlers)
+[GIN-debug] GET    /api/v1/products/:id      --> huasteca-backend/internal/controllers.(*ProductController).GetProduct-fm (4 handlers)
+[GIN-debug] GET    /api/v1/me                --> huasteca-backend/internal/controllers.(*AuthController).GetCurrentUser-fm (5 handlers)
+[GIN-debug] POST   /api/v1/products          --> huasteca-backend/internal/controllers.(*ProductController).CreateProduct-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/products/:id      --> huasteca-backend/internal/controllers.(*ProductController).UpdateProduct-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/products/:id      --> huasteca-backend/internal/controllers.(*ProductController).DeleteProduct-fm (5 handlers)
+[GIN-debug] POST   /api/v1/products/upload   --> huasteca-backend/internal/controllers.(*ProductController).UploadImage-fm (5 handlers)
+[GIN-debug] POST   /api/v1/ventas            --> huasteca-backend/internal/controllers.(*VentasController).CreateVenta-fm (5 handlers)
+[GIN-debug] GET    /api/v1/admin/ventas      --> huasteca-backend/internal/controllers.(*VentasController).GetVentas-fm (6 handlers)
+2026/04/29 01:51:40 Server starting on :8080
