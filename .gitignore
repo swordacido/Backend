@@ -1,0 +1,5 @@
+mongodb-data/
+*.log
+.env
+huasteca-server
+huasteca-server-prod
