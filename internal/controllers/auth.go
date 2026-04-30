@@ -160,3 +160,61 @@ func (ac *AuthController) GetCurrentUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
+
+func (ac *AuthController) UpdateProfile(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	var req struct {
+		Name       string `json:"name"`
+		PictureURL string `json:"picture_url"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	usersCollection := database.GetCollection("users")
+
+	update := bson.M{
+		"$set": bson.M{
+			"name":        req.Name,
+			"picture_url":  req.PictureURL,
+			"updated_at":  time.Now(),
+		},
+	}
+
+	_, err := usersCollection.UpdateOne(c.Request.Context(), bson.M{"_id": userID}, update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update profile"})
+		return
+	}
+
+	var updatedUser models.User
+	usersCollection.FindOne(c.Request.Context(), bson.M{"_id": userID}).Decode(&updatedUser)
+
+	c.JSON(http.StatusOK, gin.H{"user": updatedUser})
+}
+
+func (ac *AuthController) GetUsers(c *gin.Context) {
+	usersCollection := database.GetCollection("users")
+
+	cursor, err := usersCollection.Find(c.Request.Context(), bson.M{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+		return
+	}
+	defer cursor.Close(c.Request.Context())
+
+	var users []models.User
+	if err := cursor.All(c.Request.Context(), &users); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode users"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"users": users})
+}

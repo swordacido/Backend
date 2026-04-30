@@ -81,6 +81,7 @@ func main() {
 		authenticated.Use(middleware.AuthMiddleware(cfg.JWT_SECRET))
 		{
 			authenticated.GET("/me", authController.GetCurrentUser)
+		authenticated.PUT("/me", authController.UpdateProfile)
 
 			authenticatedProducts := authenticated.Group("/products")
 			{
@@ -95,11 +96,12 @@ func main() {
 				ventas.POST("", ventasController.CreateVenta)
 			}
 
-			admin := authenticated.Group("/admin")
-			admin.Use(middleware.RBACMiddleware(models.RoleADMIN))
-			{
-				admin.GET("/ventas", ventasController.GetVentas)
-			}
+		admin := authenticated.Group("/admin")
+		admin.Use(middleware.RBACMiddleware(models.RoleADMIN))
+		{
+			admin.GET("/ventas", ventasController.GetVentas)
+			admin.GET("/users", authController.GetUsers)
+		}
 		}
 	}
 
