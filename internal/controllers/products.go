@@ -267,9 +267,9 @@ func (pc *ProductController) UploadImage(c *gin.Context) {
 
 	ext := filepath.Ext(header.Filename)
 	filename := fmt.Sprintf("%d_%s%s", time.Now().Unix(), userID.(primitive.ObjectID).Hex(), ext)
-	uploadPath := filepath.Join(".", "uploads", filename)
+	uploadPath := filepath.Join("./public/uploads", filename)
 
-	if err := os.MkdirAll("./uploads", 0755); err != nil {
+	if err := os.MkdirAll("./public/uploads", 0755); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create upload directory"})
 		return
 	}

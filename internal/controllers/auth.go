@@ -3,8 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -217,4 +220,69 @@ func (ac *AuthController) GetUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"users": users})
+}
+
+func (ac *AuthController) UploadProfileImage(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	file, header, err := c.Request.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Image file required"})
+		return
+	}
+	defer file.Close()
+
+	if header.Size > 2*1024*1024 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "File size must be less than 2MB"})
+		return
+	}
+
+	contentType := header.Header.Get("Content-Type")
+	if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" && contentType != "image/webp" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Only image files are allowed"})
+		return
+	}
+
+	ext := filepath.Ext(header.Filename)
+	filename := fmt.Sprintf("profile_%d_%s%s", time.Now().Unix(), userID.(primitive.ObjectID).Hex(), ext)
+	uploadPath := filepath.Join("./public/uploads", filename)
+
+	if err := os.MkdirAll("./public/uploads", 0755); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create upload directory"})
+		return
+	}
+
+	out, err := os.Create(uploadPath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create file"})
+		return
+	}
+	defer out.Close()
+
+	if _, err := io.Copy(out, file); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+		return
+	}
+
+	relativePath := fmt.Sprintf("/uploads/%s", filename)
+
+	usersCollection := database.GetCollection("users")
+	update := bson.M{
+		"$set": bson.M{
+			"picture_url": relativePath,
+			"updated_at":  time.Now(),
+		},
+	}
+
+	_, err = usersCollection.UpdateOne(c.Request.Context(), bson.M{"_id": userID}, update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update profile picture"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"url": relativePath, "message": "Profile picture updated"})
 }

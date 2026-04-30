@@ -81,7 +81,8 @@ func main() {
 		authenticated.Use(middleware.AuthMiddleware(cfg.JWT_SECRET))
 		{
 			authenticated.GET("/me", authController.GetCurrentUser)
-		authenticated.PUT("/me", authController.UpdateProfile)
+			authenticated.PUT("/me", authController.UpdateProfile)
+			authenticated.POST("/me/upload", authController.UploadProfileImage)
 
 			authenticatedProducts := authenticated.Group("/products")
 			{
@@ -93,6 +94,7 @@ func main() {
 
 			ventas := authenticated.Group("/ventas")
 			{
+				ventas.GET("", ventasController.GetVentas)
 				ventas.POST("", ventasController.CreateVenta)
 			}
 
